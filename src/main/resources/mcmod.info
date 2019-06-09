@@ -1,0 +1,16 @@
+[
+{
+  "modid": "mintasm",
+  "name": "Mint ASM",
+  "description": "Um mod para corrigir varias coisas via ASM.",
+  "version": "1.0",
+  "mcversion": "1.7.10",
+  "url": "https://juanmuscaria.github.io/",
+  "updateUrl": "",
+  "authorList": ["juanmuscaria"],
+  "credits": "¯\_(ツ)_/¯",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

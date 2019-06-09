@@ -1,0 +1,98 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge' //Aplica o ForgeGradle
+
+version = "1.0"
+group= "io.github.juanmuscaria"
+archivesBaseName = "mintasm"
+
+minecraft {
+    version = "1.7.10-10.13.4.1558-1.7.10"
+    runDir = "eclipse"
+}
+
+configurations { //confgura o shade do ForgeGradle
+    shade
+    compile.extendsFrom shade
+}
+
+repositories {
+    maven {
+        name = 'spongepowered-repo'
+        url = 'http://repo.spongepowered.org/maven/'
+    }
+    mavenCentral()
+}
+
+
+dependencies {
+    shade("org.spongepowered:mixin:0.6.4-SNAPSHOT") { //Adiciona o Mixin como dependência.
+        exclude module: "launchwrapper"
+        exclude module: 'guava'
+    }
+    compileOnly fileTree(dir: 'lib', include: ['*.jar'])
+}
+
+processResources //Todo: Recolocar aquilo para automatizar o mc.mod.info
+{
+
+}
+
+
+ext {
+    mixinSrg = new File(project.buildDir, 'mixins/mixin.mint.srg') //Cria um arquivo que irá ficar o Srg gerado pelo mixin apos a compilação.
+    mixinRefMap = new File(project.buildDir, "mixins/mixin.mintasm.refmap.json") //Cria um arquivo que irá ficar o refmap gerado pelo mixin apos a compilação. Serve para identificar os methods do @inject e ouras coisas.
+}
+
+jar {
+    from project.mixinRefMap //Inclui o refmap gerado dentro do jar para ser usado pelo mixin no runtime.
+    manifest {
+        attributes(
+                'FMLCorePlugin': 'io.github.juanmuscaria.mintasm.FMLCoreMod', //Indica a class principal do CoreMod
+                'FMLCorePluginContainsFMLMod': 'false', //Todo: Botar true quando fazer o container de mod.
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker') //Todo:Fazer meu proprio class tweaker, esse class tweaker é meio quebrado no ambiente de desenvolvimento.
+    }
+    configurations.shade.each { dep -> //Adiciona o sponge no jar final
+        from(project.zipTree(dep)){
+            include 'org/spongepowered', 'org/spongepowered/**'
+        }
+    }
+}
+
+
+reobf.addExtraSrgFile project.mixinSrg //Adiciona o Srg gerado pelo mixin nos srg do reobfuscator, assim ofusca corretamente os mixins.
+
+compileJava {
+    options.compilerArgs += [
+            '-Xlint:-processing', //Ativa o anotation processor do mixin
+            "-AoutSrgFile=${project.mixinSrg.canonicalPath}", //Indica o arquio de saida do srg
+            "-AoutRefMapFile=${project.mixinRefMap.canonicalPath}", //Indica o arquivo de saida do refmap
+            "-AreobfSrgFile=${project.file('build/srgs/mcp-srg.srg').canonicalPath}" //Indica o arquivo srg para reobfuscar,aqui será o mcp para tirar as partes "humanizadas", deixando aquilo lá impossivel de ler.
+    ]
+}
+
+
+task copySrgs(type: Copy, dependsOn: 'genSrgs') { //Copia tds os srg para esse local, creio que dá para remover isso futuramente.
+    from plugins.getPlugin("forge").delayedFile('{SRG_DIR}')
+
+    include '**/*.srg'
+    into 'build/srgs'
+}
+compileJava.dependsOn copySrgs //faz o compile java depender do copySrg
+
