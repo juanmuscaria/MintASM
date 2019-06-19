@@ -25,6 +25,7 @@ archivesBaseName = "mintasm"
 minecraft {
     version = "1.7.10-10.13.4.1558-1.7.10"
     runDir = "eclipse"
+    srgExtra "PK: net/cubespace io/github/juanmuscaria/mintasm/libs/net/cubespace"
 }
 
 configurations { //confgura o shade do ForgeGradle
@@ -46,6 +47,7 @@ dependencies {
         exclude module: "launchwrapper"
         exclude module: 'guava'
     }
+    shade files('lib/Yamler-Core-2.4.0-SNAPSHOT.jar')
     compileOnly fileTree(dir: 'lib', include: ['*.jar'])
 }
 
@@ -66,11 +68,11 @@ jar {
         attributes(
                 'FMLCorePlugin': 'io.github.juanmuscaria.mintasm.FMLCoreMod', //Indica a class principal do CoreMod
                 'FMLCorePluginContainsFMLMod': 'false', //Todo: Botar true quando fazer o container de mod.
-                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker') //Todo:Fazer meu proprio class tweaker, esse class tweaker é meio quebrado no ambiente de desenvolvimento.
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker') //Todo:Fazer meu proprio class tweaker.
     }
     configurations.shade.each { dep -> //Adiciona o sponge no jar final
         from(project.zipTree(dep)){
-            include 'org/spongepowered', 'org/spongepowered/**'
+            include 'org/spongepowered', 'org/spongepowered/**','net/cubespace','net/cubespace/**'
         }
     }
 }

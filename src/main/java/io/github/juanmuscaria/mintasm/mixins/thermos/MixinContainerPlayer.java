@@ -40,40 +40,45 @@ public abstract class MixinContainerPlayer {
 
     @Shadow public InventoryCrafting craftMatrix;
 
-    //TODO:Limpar esse código, tem como optimizar isso (principalmente esse reflection todo).
+    @SuppressWarnings("ConstantConditions")
     @Inject(method = "onCraftMatrixChanged", at = @At("HEAD"), cancellable = true) //Injetar bem no inicio do metodo, assim poder cancelar ele e evitar o unchecked cast.
-    public void onCraftMatrixChanged(IInventory p_75130_, CallbackInfo ci) throws NoSuchFieldException, IllegalAccessException {
-        Object a = (Object) this; //É preciso fazer isso, já que o this nesse contexto é essa classe, mas no runtime vai ser o ContainerPlayer.
-        ContainerPlayer self = (ContainerPlayer) a;
-        Class containerclass = self.getClass().getSuperclass();
-        Field craftersField = containerclass.getDeclaredField("field_75149_d");
-        craftersField.setAccessible(true);
-        List crafters = (List) craftersField.get(self);
+    public void onCraftMatrixChanged(IInventory p_75130_, CallbackInfo ci) {
         try {
-            Field last = CraftingManager.getInstance().getClass().getDeclaredField("lastCraftView");
-            last.setAccessible(true);
-            last.set(CraftingManager.getInstance(), getBukkitView(self));
-            self.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj));
-            ItemStack craftResult = CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj);
-            self.craftResult.setInventorySlotContents(0, craftResult);
+            Object a = (Object) this; //É preciso fazer isso, já que o this nesse contexto é essa classe, mas no runtime vai ser o ContainerPlayer.
+            ContainerPlayer self = (ContainerPlayer) a;
+            Class containerclass = self.getClass().getSuperclass();
+            Field craftersField = containerclass.getDeclaredField("field_75149_d");
+            craftersField.setAccessible(true);
+            List crafters = (List) craftersField.get(self);
 
+                Field last = CraftingManager.getInstance().getClass().getDeclaredField("lastCraftView");
+                last.setAccessible(true);
+                last.set(CraftingManager.getInstance(), getBukkitView(self));
+                self.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj));
+                ItemStack craftResult = CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj);
+                self.craftResult.setInventorySlotContents(0, craftResult);
 
-            if (crafters.size() < 1)
-            {
-                return;
-            }
-
-            EntityPlayerMP player = (EntityPlayerMP) crafters.get(0);
-            player.playerNetServerHandler.sendPacket(new S2FPacketSetSlot(player.openContainer.windowId, 0, craftResult));
+                if (crafters.size() < 1)
+                {
+                    return;
+                }
+                if (crafters.get(0) instanceof EntityPlayerMP) {
+                    EntityPlayerMP player = (EntityPlayerMP) crafters.get(0);
+                    player.playerNetServerHandler.sendPacket(new S2FPacketSetSlot(player.openContainer.windowId, 0, craftResult));
+                }
+                else {
+                    self.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj));
+                }
+            ci.cancel();
         }
         catch (Exception e){
-            self.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(self.craftMatrix, this.thePlayer.worldObj));
+            e.printStackTrace();
         }
-        ci.cancel();
     }
 
     //Pura gambiarra do thermos
-    public CraftInventoryView getBukkitView(ContainerPlayer self) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @SuppressWarnings("ConstantConditions")
+    public CraftInventoryView getBukkitView(ContainerPlayer self) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassCastException {
         if (bukkitEntity != null)
         {
             return bukkitEntity;
