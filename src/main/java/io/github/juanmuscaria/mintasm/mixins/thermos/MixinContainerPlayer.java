@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 //Fix de um unchecked cast, assim causando um InternalServerError disconnect. (https://github.com/Funwayguy/BetterQuesting/issues/605)
+@SuppressWarnings("ALL") //Isso é um mixin, ele vai gerar um monte de warnings inuteis.
 @Mixin(ContainerPlayer.class)
 public abstract class MixinContainerPlayer {
     @Shadow
@@ -40,7 +41,6 @@ public abstract class MixinContainerPlayer {
 
     @Shadow public InventoryCrafting craftMatrix;
 
-    @SuppressWarnings("ConstantConditions")
     @Inject(method = "onCraftMatrixChanged", at = @At("HEAD"), cancellable = true) //Injetar bem no inicio do metodo, assim poder cancelar ele e evitar o unchecked cast.
     public void onCraftMatrixChanged(IInventory p_75130_, CallbackInfo ci) {
         try {

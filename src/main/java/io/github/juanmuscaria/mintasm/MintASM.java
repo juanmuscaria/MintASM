@@ -6,8 +6,6 @@ import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.event.*;
 import org.apache.logging.log4j.Logger;
 
-
-@SuppressWarnings("NonAsciiCharacters")
 public class MintASM extends DummyModContainer {
     public static MintASM MintASM;
     public static Logger logger;

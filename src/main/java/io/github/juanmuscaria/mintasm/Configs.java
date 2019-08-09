@@ -4,6 +4,7 @@ import net.cubespace.Yamler.Config.*;
 
 import java.io.File;
 
+@SuppressWarnings("WeakerAccess")
 public class Configs extends YamlConfig {
     private static Configs instance;
 
