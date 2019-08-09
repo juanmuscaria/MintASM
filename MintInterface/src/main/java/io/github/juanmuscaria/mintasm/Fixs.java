@@ -9,8 +9,9 @@ import java.lang.reflect.Field;
 public class Fixs {
 
     //Literalmente uma cópia do patch do dropper com o do hopper.
-    public static void dropperFix(Object  world, int p_149941_2_, int p_149941_3_, int p_149941_4_, Object self2) {
+    public static void dropperFix(Object  world, int p_149941_2_, int p_149941_3_, int p_149941_4_, Object self2,Object shadow) {
         BlockDropper self = (BlockDropper) self2;
+        IDispenseBehavior field_149947_P = (IDispenseBehavior) shadow;
         World p_149941_1_ = (World) world;
         SourceBlock var5 = new SourceBlock(p_149941_1_, p_149941_2_, p_149941_3_, p_149941_4_);
         TileEntityDispenser tileentitydispenser = (TileEntityDispenser)var5.getTileEntity();
@@ -85,15 +86,7 @@ public class Fixs {
                     }
                 } else {
                     itemstack1 = null;
-                    try {
-                        Field field_149947_P = self.getClass().getField("field_149947_P");
-                        field_149947_P.setAccessible(true);
-                        IDispenseBehavior objectFromField = (IDispenseBehavior) field_149947_P.get(self);
-                        itemstack1  = objectFromField.a(var5, itemstack);
-
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                    itemstack1  = field_149947_P.a(var5, itemstack);
                     if (itemstack1 != null && itemstack1.count == 0) {
                         itemstack1 = null;
                     }

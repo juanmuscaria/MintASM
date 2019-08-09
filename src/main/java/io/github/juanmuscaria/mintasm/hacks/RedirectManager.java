@@ -19,10 +19,10 @@ public class RedirectManager {
             throw new RuntimeException(e);
         }
     }
-    public static void dropperFix(World p_149941_1_, int p_149941_2_, int p_149941_3_, int p_149941_4_, Object self){
+    public static void dropperFix(World p_149941_1_, int p_149941_2_, int p_149941_3_, int p_149941_4_, Object self,Object shadow){
         try {
-            Method func_149941_e = redirect.getClass().getDeclaredMethod("dropperFix",World.class,int.class,int.class,int.class,Object.class);
-            func_149941_e.invoke(redirect,p_149941_1_,p_149941_2_,p_149941_3_,p_149941_4_,self);
+            Method func_149941_e = redirect.getClass().getDeclaredMethod("dropperFix",World.class,int.class,int.class,int.class,Object.class,Object.class);
+            func_149941_e.invoke(redirect,p_149941_1_,p_149941_2_,p_149941_3_,p_149941_4_,self,shadow);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             MintASM.logger.error("Ocorreu um erro ao acionar um dropper, pulando acionamento para evitar um crash.");
             e.printStackTrace();
