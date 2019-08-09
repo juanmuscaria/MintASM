@@ -1,0 +1,3 @@
+name: MintASM
+main: io.github.juanmuscaria.mintasm.MintBukkit
+version: "1.0"

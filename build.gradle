@@ -18,6 +18,10 @@ buildscript {
 
 apply plugin: 'forge' //Aplica o ForgeGradle
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
+
 version = "1.0"
 group= "io.github.juanmuscaria"
 archivesBaseName = "mintasm"
@@ -49,9 +53,10 @@ dependencies {
     }
     shade files('lib/Yamler-Core-2.4.0-SNAPSHOT.jar')
     compileOnly fileTree(dir: 'lib', include: ['*.jar'])
+    compile project(':MintInterface')
 }
 
-processResources //Todo: Recolocar aquilo para automatizar o mc.mod.info
+processResources //Todo: Recolocar aquilo para automatizar o mcmod.info
 {
 
 }
@@ -67,7 +72,8 @@ jar {
     manifest {
         attributes(
                 'FMLCorePlugin': 'io.github.juanmuscaria.mintasm.FMLCoreMod', //Indica a class principal do CoreMod
-                'FMLCorePluginContainsFMLMod': 'false', //Todo: Botar true quando fazer o container de mod.
+                'FMLCorePluginContainsFMLMod': 'true', //Indica que o coremod contem um forge mod
+                'TweakOrder': '0',
                 'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker') //Todo:Fazer meu proprio class tweaker.
     }
     configurations.shade.each { dep -> //Adiciona o sponge no jar final

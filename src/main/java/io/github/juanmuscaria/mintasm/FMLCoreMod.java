@@ -12,9 +12,13 @@ public class FMLCoreMod implements IFMLLoadingPlugin{
 
     public FMLCoreMod(){
         System.setProperty("mixin.debug.export", "true");
-        System.out.println("Iniciando o MintASM!");
+        System.out.println("[MintASM]-Carregando arquivo de configurações!");
+        new Configs();
         MixinBootstrap.init();
-        Mixins.addConfiguration("mixins/mixins.thermos.json");
+        if (Configs.getInstance().mixins_thermos){
+            System.out.println("[MintASM]-Injetando mixins do thermos!");
+            Mixins.addConfiguration("mixins/mixins.thermos.json");
+        }
     }
 
     @Override
@@ -24,7 +28,7 @@ public class FMLCoreMod implements IFMLLoadingPlugin{
 
     @Override
     public String getModContainerClass() {
-        return null;
+        return MintASM.class.getName();
     }
 
     @Override
